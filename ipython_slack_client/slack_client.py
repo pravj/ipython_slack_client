@@ -11,6 +11,12 @@ kc = KernelClient()
 def replace_color_codes(text):
     return re.sub("\[0(;[0-9]+)?m", "", text)
 
+def bold_text(text):
+    text_lines = text.split('\n')
+    bold_text_lines = list(map(lambda l: "*{}*".format(l), text_lines))
+
+    return "\n".join(bold_text_lines)
+
 if sc.rtm_connect():
     while sc.server.connected is True:
         # collect event payloads from real-time API stream
@@ -36,7 +42,11 @@ if sc.rtm_connect():
                     "chat.update",
                     channel=event_payload['channel'],
                     ts=event_payload['ts'],
-                    attachments=[{"color": "#87ceeb", "pretext": "", "text": event_payload['text']}]
+                    attachments=[{
+                        "color": "#87ceeb",
+                        "pretext": "",
+                        "text": bold_text(event_payload['text'])
+                    }]
                 )
 
                 if reply_type in ['data', 'stdout']:
