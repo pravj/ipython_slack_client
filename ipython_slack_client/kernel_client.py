@@ -28,13 +28,17 @@ class KernelClient():
             except queue.Empty:
                 break
 
+        result_type = ''
         if 'data' in message_content:
             result = message_content['data']['text/plain']
+            result_type = 'data'
         elif message_content.get('name', '') == 'stdout':
             result = message_content['text']
+            result_type = 'stdout'
         elif 'traceback' in message_content:
             result = '\n'.join(message_content['traceback'])
+            result_type = 'error'
         else:
             result = ''
 
-        return result
+        return result_type, result
