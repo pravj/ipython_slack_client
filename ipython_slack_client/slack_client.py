@@ -1,22 +1,15 @@
 import os
-import re
 import time
+
 from slackclient import SlackClient
 from kernel_client import KernelClient
+import utils
 
 slack_token = os.environ["SLACK_API_TOKEN"]
 sc = SlackClient(slack_token)
 
 kc = KernelClient()
 
-def replace_color_codes(text):
-    return re.sub("\[0(;[0-9]+)?m", "", text)
-
-def bold_text(text):
-    text_lines = text.split('\n')
-    bold_text_lines = list(map(lambda l: "*{}*".format(l), text_lines))
-
-    return "\n".join(bold_text_lines)
 
 if sc.rtm_connect():
     while sc.server.connected is True:
@@ -46,7 +39,9 @@ if sc.rtm_connect():
                     attachments=[{
                         "color": "#87ceeb",
                         "pretext": "",
-                        "text": bold_text(event_payload['text'])
+                        "text": utils.get_formatted_input(
+                            event_payload['text']
+                        )
                     }]
                 )
 
@@ -59,7 +54,11 @@ if sc.rtm_connect():
                     sc.api_call(
                         "chat.postMessage",
                         channel=event_payload['channel'],
-                        attachments=[{"color": "#36a64f", "pretext": "", "text": reply}],
+                        attachments=[{
+                            "color": "#36a64f",
+                            "pretext": "",
+                            "text": reply
+                        }],
                         as_user=True
                     )
                 elif reply_type == 'error':
@@ -74,7 +73,7 @@ if sc.rtm_connect():
                         attachments=[{
                             "color": "#f08080",
                             "pretext": "",
-                            "text": replace_color_codes(reply)
+                            "text": utils.replace_color_codes(reply, "")
                         }],
                         as_user=True
                     )
