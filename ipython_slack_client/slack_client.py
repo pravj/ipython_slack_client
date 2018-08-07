@@ -10,6 +10,9 @@ sc = SlackClient(slack_token)
 
 kc = KernelClient()
 
+# execution counter (default: 1)
+execution_count = 1
+
 
 if sc.rtm_connect():
     while sc.server.connected is True:
@@ -38,7 +41,7 @@ if sc.rtm_connect():
                     ts=event_payload['ts'],
                     attachments=[{
                         "color": "#87ceeb",
-                        "pretext": "",
+                        "pretext": "In [{}]:".format(execution_count),
                         "text": utils.get_formatted_input(
                             event_payload['text']
                         )
@@ -56,7 +59,7 @@ if sc.rtm_connect():
                         channel=event_payload['channel'],
                         attachments=[{
                             "color": "#36a64f",
-                            "pretext": "",
+                            "pretext": "Out [{}]:".format(execution_count),
                             "text": reply
                         }],
                         as_user=True
@@ -72,11 +75,14 @@ if sc.rtm_connect():
                         channel=event_payload['channel'],
                         attachments=[{
                             "color": "#f08080",
-                            "pretext": "",
+                            "pretext": "Out [{}]:".format(execution_count),
                             "text": utils.replace_color_codes(reply, "")
                         }],
                         as_user=True
                     )
+
+                # increase the execution count
+                execution_count += 1
             else:
                 print(event_payload, 'failed')
 
