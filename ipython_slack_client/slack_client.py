@@ -31,8 +31,14 @@ if sc.rtm_connect():
             'bot_id' not in event_payload:
                 print('message', event_payload)
 
+                # input preprocessor pipeline
+                code_input = event_payload.get('text', '')
+
+                # replace URL formatting from input
+                code_input = utils.replace_url_format(code_input)
+
                 # execute the message string in kernel as code
-                reply_type, reply = kc.execute(event_payload.get('text', ''))
+                reply_type, reply = kc.execute(code_input)
 
                 # update the parent message with result using formatting
                 sc.api_call(

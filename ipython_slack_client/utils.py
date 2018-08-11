@@ -7,6 +7,7 @@ import builtins
 from collections import defaultdict
 
 COLOR_CODE_REGEX = r"\[0(;[0-9]+)?m"
+URL_FORMAT_REGEX = r"<(.*?)>"
 
 
 def is_reserved_identifier(token):
@@ -33,6 +34,25 @@ def replace_color_codes(text, replacement):
     """
 
     return re.sub(COLOR_CODE_REGEX, replacement, text)
+
+def replace_url_format(text):
+    """Replace parsed URL format from a given string.
+    https://api.slack.com/docs/message-formatting#linking_to_urls
+
+    Args:
+        text (str): Original string to replacement from.
+
+    Returns:
+        str: Mutated string after the replacement.
+    """
+
+    url_content_match = re.search(URL_FORMAT_REGEX, text)
+    if url_content_match is None:
+        return text
+
+    url_content = url_content_match.group(1)
+
+    return re.sub(URL_FORMAT_REGEX, url_content, text)
 
 def get_bold_token(token):
     """Apply bold formatting to a given token.
